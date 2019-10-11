@@ -8,6 +8,7 @@ public class CompositeQueryApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CompositeQueryApplication.class, args);
+		System.out.println("start success");
 	}
 
 }

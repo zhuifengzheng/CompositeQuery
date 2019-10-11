@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建文件</title>
+    <script  type="text/javascript" src="http://cdn.static.runoob.com/libs/jquery/1.8.3/jquery.js"></script>
+</head>
+
+<style type="text/css">
+    .fa{
+        position: absolute;/*绝对定位*/
+        width: 400px;
+        height: 600px;
+
+        text-align: center;/*(让div中的内容居中)*/
+        top: 50%;
+        left: 50%;
+        margin-top: -250px;
+        margin-left: -150px;
+    }
+    input{display: block; width: 335.6px}
+
+    textarea{display: block;}
+</style>
+<body>
+<div class="fa">
+    <form class="ff" action="##" method="post">
+
+            <input type="text"  name="methodName"  placeholder="请输入方法名称">
+            <input type="text"  name="tableName"  placeholder="请输入表名">
+            <input type="text"  name="inputVOName"  placeholder="请输入输入参数包装实体名称">
+            <input  type="text"  name="outputVOName"  placeholder="请输入输出参数包装实体名称">
+            <textarea rows="10" cols="50" name="inputVO" placeholder="请输入输入参数,格式为:PERSON_NAME:personName:String,PERSON_AGE:personAge:Integer"></textarea>
+            <textarea rows="10" cols="50" name="outputVO" placeholder="请输入返回参数,格式为:personName:String,personAge:Integer"></textarea>
+            <input type="button" value="登录" onclick="login()">
+
+    </form>
+</div>
+
+<script type="text/javascript">
+    function login() {
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/create" ,//url
+            data: $('.ff').serialize(),
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result == 200) {
+                    window.location.href="/success";
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    }
+</script>
+</body>
+</html>

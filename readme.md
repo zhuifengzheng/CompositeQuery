@@ -1,6 +1,6 @@
-#组合查询API生成模板工具
+# 组合查询API生成模板工具
 
-##导入分析
+## 导入分析
 > + 需要传入类型为查询参数的数据格式： PERSON_NAME:personName:String,PERSON_AGE:personAge:Integer
 > + 需要返回参数数据格式：personName:String,personAge:Integer
 > + 入参的实体名称：xxxVO  返回参数的实体名称： xxxVO2

@@ -1,0 +1,6 @@
+##thymeleaf\u9875\u9762\u6A21\u677F\u914D\u7F6E
+spring:
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
