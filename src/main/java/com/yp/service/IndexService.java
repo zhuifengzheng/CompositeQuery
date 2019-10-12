@@ -1,5 +1,6 @@
 package com.yp.service;
 
+import com.yp.vo.IndexVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
@@ -14,15 +15,25 @@ public interface IndexService {
     /**
      * 执行入口，解析参数封装
      */
-    void createEntrance(String inputVO, String outputVO, String methodName,
-                        String tableName, String inputVOName, String outputVOName);
+    void createEntrance(IndexVO vo);
 
     /**
      * 创建mapper.xml
-     *
-     * @param mapperDto Map<personName,Map<PERSON_NAME,String>>
+     * @param mapperDto
+     * @param outputVOName
+     * @param tableName
      */
-    void createMapperXML(Map<String, Map<String, String>> mapperDto);
+    @Deprecated
+    void createMapperXML(Map<String, Map<String, String>> mapperDto, String outputVOName, String tableName);
+
+    /**
+     * 创建mapper.xml
+     * @param mapperDto
+     * @param outputVOName
+     * @param tableName
+     */
+    void createMapperXML(String outputVOName, String tableName, Map<String, String> mapperDto);
+
 
     /**
      * 创建mapper.java

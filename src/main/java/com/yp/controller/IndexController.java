@@ -1,6 +1,8 @@
 package com.yp.controller;
 
+import com.yp.service.IndexService;
 import com.yp.vo.IndexVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +17,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class IndexController {
 
+    @Autowired
+    private IndexService indexService;
+
     /**
      * 处理入口
      */
     @PostMapping("/create")
     @ResponseBody
     public String doCreateFile(IndexVO vo) {
+        indexService.createEntrance(vo);
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxx");
         return "200";
     }
