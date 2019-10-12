@@ -24,21 +24,21 @@ public class IndexServiceImpl implements IndexService {
 //        Map<String,Map<String,String>> inputMap = CommonUtil.parseInputVOXML(vo.getInputVO());
 //        createMapperXML(inputMap, vo.getOutputVOName(), vo.getTableName());
         Map<String, String> inputMap = CommonUtil.parseInputVOToXML(vo.getInputVO());
-        createMapperXML(vo.getOutputVOName(), vo.getTableName(), inputMap);
+        createMapperXML(vo.getOutputVOName(), vo.getTableName(), inputMap, vo.getPackageName());
 
         //解析数据给 inputVO.java
         Map<String, String> inMap = CommonUtil.parseInputVO(vo.getInputVO());
-        createInputVO(inMap, vo.getInputVOName());
+        createInputVO(inMap, vo.getInputVOName(), vo.getPackageName());
 
         //解析数据给 outputVO.java
         Map<String, String> outMap = CommonUtil.parseOutInputVO(vo.getOutputVO());
-        createOutputVO(outMap, vo.getOutputVOName());
+        createOutputVO(outMap, vo.getOutputVOName(), vo.getPackageName());
 
         //创建repository数据 包括实现类的数据
-        createRepository(vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName());
+        createRepository(vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
 
         //创建controller中的数据
-        createController(vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName());
+        createController(vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
     }
 
     @Override
@@ -78,9 +78,9 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public void createMapperXML(String outputVOName, String tableName, Map<String, String> mapperDto) {
+    public void createMapperXML(String outputVOName, String tableName, Map<String, String> mapperDto, String packageName) {
         StringBuilder content = new StringBuilder();
-        content.append("<select id=\"selectCondition\" resultType=\"" + outputVOName + "\">").append("\n")
+        content.append("<select id=\"selectCondition\" resultType=\"" +packageName+".vo."+ outputVOName + "\">").append("\n")
                 .append("\t").append("SELECT * FROM " + tableName + " tb").append("\n")
                 .append("\t").append("WHERE tb.TENANT_ID = ${tenantId}").append("\n");
         Set<Map.Entry<String, String>> inMap = mapperDto.entrySet();
@@ -95,9 +95,23 @@ public class IndexServiceImpl implements IndexService {
                         .append("\t").append("</if>").append("\n");
             }
             if ("Date".equalsIgnoreCase(splitValue[1])) {
-                content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
-                        .append("\t\t").append("AND tb." + splitValue[0] + " &gt;= DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
-                        .append("\t").append("</if>").append("\n");
+                String isForm = splitValue[1].substring(splitValue[1].length() - 4, splitValue[1].length());
+                String isTo = splitValue[1].substring(splitValue[1].length() - 2, splitValue[1].length());
+                if("form".equalsIgnoreCase(isForm)){
+                    content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
+                            .append("\t\t").append("AND tb." + splitValue[0] + " &gt;= DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
+                            .append("\t").append("</if>").append("\n");
+                }
+                else if ("to".equalsIgnoreCase(isTo)){
+                    content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
+                            .append("\t\t").append("AND tb." + splitValue[0] + " &lt;= DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
+                            .append("\t").append("</if>").append("\n");
+                }else {
+                    content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
+                            .append("\t\t").append("AND tb." + splitValue[0] + " = DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
+                            .append("\t").append("</if>").append("\n");
+                }
+
             }
 
 
@@ -109,32 +123,27 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public void createMapper(Map<String, Map<String, String>> mapperDto) {
+    public void createMapper(Map<String, Map<String, String>> mapperDto, String packageName) {
 
     }
 
     @Override
-    public void createInputVO(Map<String, String> inputVO, String inputVOName) {
+    public void createInputVO(Map<String, String> inputVO, String inputVOName, String packageName) {
 
     }
 
     @Override
-    public void createOutputVO(Map<String, String> outputVO, String outputVOName) {
+    public void createOutputVO(Map<String, String> outputVO, String outputVOName, String packageName) {
 
     }
 
     @Override
-    public void createRepository(String methodName, String inputVOName, String outputVOName) {
+    public void createRepository(String methodName, String inputVOName, String outputVOName, String packageName) {
 
     }
 
     @Override
-    public void createController(String methodName, String inputVOName, String outputVOName) {
+    public void createController(String methodName, String inputVOName, String outputVOName, String packageName) {
 
-    }
-
-    @Override
-    public String analysisTableName(String tableName) {
-        return null;
     }
 }

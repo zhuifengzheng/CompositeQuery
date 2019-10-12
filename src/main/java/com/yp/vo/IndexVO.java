@@ -16,6 +16,7 @@ public class IndexVO {
      *  tableName 表名
      *  inputVOName 输入参数包装实体名称
      *  outputVOName 输出参数包装实体名称
+     *  packageName 包根路径
      */
     private String inputVO;
     private String  outputVO;
@@ -23,4 +24,5 @@ public class IndexVO {
     private String  tableName;
     private String  inputVOName;
     private String  outputVOName;
+    private String packageName;
 }

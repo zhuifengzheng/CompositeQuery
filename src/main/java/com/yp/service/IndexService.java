@@ -31,32 +31,36 @@ public interface IndexService {
      * @param mapperDto
      * @param outputVOName
      * @param tableName
+     * @param packageName
      */
-    void createMapperXML(String outputVOName, String tableName, Map<String, String> mapperDto);
+    void createMapperXML(String outputVOName, String tableName, Map<String, String> mapperDto, String packageName);
 
 
     /**
      * 创建mapper.java
      *
      * @param mapperDto
+     * @param packageName
      */
-    void createMapper(Map<String, Map<String, String>> mapperDto);
+    void createMapper(Map<String, Map<String, String>> mapperDto, String packageName);
 
     /**
      * 创建输入VO实体
      *
      * @param inputVO
      * @param inputVOName
+     * @param packageName
      */
-    void createInputVO(Map<String, String> inputVO, String inputVOName);
+    void createInputVO(Map<String, String> inputVO, String inputVOName, String packageName);
 
     /**
      * 创建输入VO实体
      *
      * @param outputVO
      * @param outputVOName
+     * @param packageName
      */
-    void createOutputVO(Map<String, String> outputVO, String outputVOName);
+    void createOutputVO(Map<String, String> outputVO, String outputVOName, String packageName);
 
     /**
      * 创建repository 包括实现类
@@ -64,8 +68,9 @@ public interface IndexService {
      * @param methodName
      * @param inputVOName
      * @param outputVOName
+     * @param packageName
      */
-    void createRepository(String methodName, String inputVOName, String outputVOName);
+    void createRepository(String methodName, String inputVOName, String outputVOName, String packageName);
 
 
     /**
@@ -74,13 +79,8 @@ public interface IndexService {
      * @param methodName
      * @param inputVOName
      * @param outputVOName
+     * @param packageName
      */
-    void createController(String methodName, String inputVOName, String outputVOName);
+    void createController(String methodName, String inputVOName, String outputVOName, String packageName);
 
-    /**
-     * 解析表名 MT_LOV_TABLE => mtLovTable
-     * @param tableName :
-     * @return java.lang.String
-     */
-    String analysisTableName(String tableName);
 }

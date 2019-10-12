@@ -143,6 +143,10 @@ public class CommonUtil {
         String rootName = new File("").getCanonicalPath()
                 + File.separator + "src" + File.separator +"common"+ File.separator;
         System.out.println(rootName);
+        String str = "123456789";
+        String isForm = str.substring(str.length()-4,str.length());
+
+        System.out.println(isForm);
     }
 
 
