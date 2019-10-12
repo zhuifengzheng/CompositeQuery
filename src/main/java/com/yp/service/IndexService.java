@@ -65,4 +65,11 @@ public interface IndexService {
      * @param outputVOName
      */
     void createController(String methodName, String inputVOName, String outputVOName);
+
+    /**
+     * 解析表名 MT_LOV_TABLE => mtLovTable
+     * @param tableName :
+     * @return java.lang.String
+     */
+    String analysisTableName(String tableName);
 }
