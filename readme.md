@@ -10,15 +10,21 @@
 
 ## mapper.xml的生成
 >+ 解析后为 Map<String,Map<String,String>> => Map<personName,Map<PERSON_NAME,String>>
-```
-select * 
-from 
-    xxxtable tb
-where 
-    tb.TEALENTID = #{tealentId}
-    if(dto.personName != null){
-        and tb.PERSON_NAME = #{dto.personName}
-    }
+```    
+     <select id="selectCondition" resultType="tarzan.actual.domain.vo.MtWkcShiftVO9">
+            SELECT *
+            FROM mt_wkc_shift ws
+            WHERE ws.TENANT_ID = ${tenantId}
+            <if test="condition.wkcShiftId != null">
+                AND ws.WKC_SHIFT_ID = #{condition.wkcShiftId}
+            </if>
+            <if test="condition.workcellId != null">
+                AND ws.workcell_id = #{condition.workcellId}
+            </if>
+            <if test="condition.shiftDateFrom != null">
+                AND ws.SHIFT_DATE &gt;= DATE_FORMAT(#{condition.shiftDateFrom},'%Y-%m-%d %H:%i:%S')
+            </if>
+     </selset>
 
 ```
 
@@ -30,31 +36,37 @@ where
 
 ## mapper.java层方法生成
 ```
-List<xxxVO2> selectCondition(@Param(value="tealentId") Long tealentId,@Param(value="dto") xxxVo dto)
+List<MtWkcShiftVO9> selectCondition(@Param(value = "tenantId") Long tenantId,
+                    @Param(value = "condition") MtWkcShiftVO8 condition);
 ```
 
 ## repository层方法生成、repositoryImpl方法生成
 ```
-List<xxxVO2> xxx(Long tealentId, xxxVo dto);
+List<MtWkcShiftVO9> propertyLimitWkcShiftPropertyQuery(Long tenantId, MtWkcShiftVO8 dto);
 
-List<xxxVO2> xxx(Long tealentId, xxxVo dto){
-    List<xxxVO2> VO2List = mapper.selectCondition(tealentId, dto);
-}
+@Override
+    public List<MtWkcShiftVO9> propertyLimitWkcShiftPropertyQuery(Long tenantId, MtWkcShiftVO8 dto) {
+        List<MtWkcShiftVO9> shiftVO9List = mtWkcShiftMapper.selectCondition(tenantId, dto);
+        if (CollectionUtils.isEmpty(shiftVO9List)) {
+            return null;
+        }
+     }
 ```
 ## controller层方法生成
 ```
-@AoiOperation(value="xxx")
-@PostMapping(value="/")
-@Permission()
-public ResponseData<List<xxxVO2>> xxx(@PathVariable("organizationId") Long tealentId, @Responsebody xxxVO dto){
-    ResponseData<List<xxxVO2>> reponseData = new ResponseData<List<xxxVO2>>();
-    try{
-        reponseData.setRow(repository.xxx(tealentId, dto));
-    }catch(Exception e){
-        reponseData.setSuccess(false);
-        reponseData.setMessage(e.getMessage());
-    }
-    
-}
+@ApiOperation(value = "propertyLimitWkcShiftPropertyQuery")
+    @PostMapping(value = {"/shift/property/query"}, produces = "application/json;charset=UTF-8")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    public ResponseData<List<MtWkcShiftVO9>> propertyLimitWkcShiftPropertyQuery(
+                    @PathVariable("organizationId") Long tenantId, @RequestBody MtWkcShiftVO8 dto) {
+        ResponseData<List<MtWkcShiftVO9>> result = new ResponseData<List<MtWkcShiftVO9>>();
+        try {
+            result.setRows(repository.propertyLimitWkcShiftPropertyQuery(tenantId, dto));
+        } catch (Exception e) {
+            result.setSuccess(false);
+            result.setMessage(e.getMessage());
+        }
+        return result;
+ }
 
 ```
