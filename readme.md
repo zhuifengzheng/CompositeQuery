@@ -9,7 +9,7 @@
 
 
 ## mapper.xml的生成
->+ 解析后为 Map<String,Map<String,String>> => Map<personName,Map<PERSON_NAME,String>>
+>+ 解析后为 Map<String,String> => Map<Map<personName,PERSON_NAME:String>>
 ```    
      <select id="selectCondition" resultType="tarzan.actual.domain.vo.MtWkcShiftVO9">
             SELECT *
