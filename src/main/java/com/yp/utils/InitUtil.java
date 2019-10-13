@@ -14,6 +14,16 @@ public class InitUtil {
     static {
 
         IMPORT_PACK_MAP.put("DATE", "import java.util.Date;");
+        IMPORT_PACK_MAP.put("List<String>", "import java.util.List;");
 
+    }
+
+    /**
+     * 首字母大写
+     * @param propertyName
+     * @return
+     */
+    public static String generateFileName(String propertyName) {
+        return propertyName.substring(0, 1).toUpperCase()+propertyName.substring(1, propertyName.length());
     }
 }

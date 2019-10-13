@@ -38,11 +38,13 @@ public interface IndexService {
 
     /**
      * 创建mapper.java
-     *
-     * @param mapperDto
+     * @param tableName
+     * @param methodName
+     * @param inputVOName
+     * @param outputVOName
      * @param packageName
      */
-    void createMapper(Map<String, Map<String, String>> mapperDto, String packageName);
+    void createMapper(String tableName, String methodName, String inputVOName, String outputVOName, String packageName);
 
     /**
      * 创建输入VO实体
@@ -65,22 +67,24 @@ public interface IndexService {
     /**
      * 创建repository 包括实现类
      *
+     * @param tableName
      * @param methodName
      * @param inputVOName
      * @param outputVOName
-     * @param packageName
+     * @param packageName 导入的包 这里也可以不使用
      */
-    void createRepository(String methodName, String inputVOName, String outputVOName, String packageName);
+    void createRepository(String tableName, String methodName, String inputVOName, String outputVOName, String packageName);
 
 
     /**
      * 创建controller层
      *
+     * @param tableName
      * @param methodName
      * @param inputVOName
      * @param outputVOName
      * @param packageName
      */
-    void createController(String methodName, String inputVOName, String outputVOName, String packageName);
+    void createController(String tableName, String methodName, String inputVOName, String outputVOName, String packageName);
 
 }

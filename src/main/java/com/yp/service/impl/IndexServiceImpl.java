@@ -2,6 +2,7 @@ package com.yp.service.impl;
 
 import com.yp.service.IndexService;
 import com.yp.utils.CommonUtil;
+import com.yp.utils.InitUtil;
 import com.yp.vo.IndexVO;
 import org.springframework.stereotype.Service;
 
@@ -21,24 +22,30 @@ public class IndexServiceImpl implements IndexService {
     public void createEntrance(IndexVO vo) {
 
         //解析数据给 mapper.xml  这种Map<String,Map<String,String>>在后面循环时候数据会重复
-//        Map<String,Map<String,String>> inputMap = CommonUtil.parseInputVOXML(vo.getInputVO());
+//        Map<String,Map<String,String>> inputMap = CommonUtil.parseInputVOXML(inputVO);
 //        createMapperXML(inputMap, vo.getOutputVOName(), vo.getTableName());
-        Map<String, String> inputMap = CommonUtil.parseInputVOToXML(vo.getInputVO());
+        //过滤空格和换行
+        String inputVO = vo.getInputVO().replaceAll("[\\s*\\t\\n\\r]", "");
+        String outputVO = vo.getOutputVO().replaceAll("[\\s*\\t\\n\\r]", "");
+        Map<String, String> inputMap = CommonUtil.parseInputVOToXML(inputVO);
         createMapperXML(vo.getOutputVOName(), vo.getTableName(), inputMap, vo.getPackageName());
 
+        //创建mapper.java
+        createMapper(vo.getTableName(), vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
+
         //解析数据给 inputVO.java
-        Map<String, String> inMap = CommonUtil.parseInputVO(vo.getInputVO());
+        Map<String, String> inMap = CommonUtil.parseInputVO(inputVO);
         createInputVO(inMap, vo.getInputVOName(), vo.getPackageName());
 
         //解析数据给 outputVO.java
-        Map<String, String> outMap = CommonUtil.parseOutInputVO(vo.getOutputVO());
+        Map<String, String> outMap = CommonUtil.parseOutInputVO(outputVO);
         createOutputVO(outMap, vo.getOutputVOName(), vo.getPackageName());
 
         //创建repository数据 包括实现类的数据
-        createRepository(vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
+        createRepository(vo.getTableName(), vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
 
         //创建controller中的数据
-        createController(vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
+        createController(vo.getTableName(), vo.getMethodName(), vo.getInputVOName(), vo.getOutputVOName(), vo.getPackageName());
     }
 
     @Override
@@ -79,8 +86,9 @@ public class IndexServiceImpl implements IndexService {
 
     @Override
     public void createMapperXML(String outputVOName, String tableName, Map<String, String> mapperDto, String packageName) {
+
         StringBuilder content = new StringBuilder();
-        content.append("<select id=\"selectCondition\" resultType=\"" +packageName+".vo."+ outputVOName + "\">").append("\n")
+        content.append("<select id=\"selectCondition\" resultType=\"" + packageName + ".domain.vo." + outputVOName + "\">").append("\n")
                 .append("\t").append("SELECT * FROM " + tableName + " tb").append("\n")
                 .append("\t").append("WHERE tb.TENANT_ID = ${tenantId}").append("\n");
         Set<Map.Entry<String, String>> inMap = mapperDto.entrySet();
@@ -89,61 +97,192 @@ public class IndexServiceImpl implements IndexService {
             String value = map.getValue();
             //这里转义 .
             String[] splitValue = value.split("\\.");
-            if ("String".equalsIgnoreCase(splitValue[1])) {
-                content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
-                        .append("\t\t").append("AND tb." + splitValue[0] + " = #{dto." + key + "}").append("\n")
-                        .append("\t").append("</if>").append("\n");
-            }
             if ("Date".equalsIgnoreCase(splitValue[1])) {
                 String isForm = splitValue[1].substring(splitValue[1].length() - 4, splitValue[1].length());
                 String isTo = splitValue[1].substring(splitValue[1].length() - 2, splitValue[1].length());
-                if("form".equalsIgnoreCase(isForm)){
+                if ("form".equalsIgnoreCase(isForm)) {
                     content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
                             .append("\t\t").append("AND tb." + splitValue[0] + " &gt;= DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
                             .append("\t").append("</if>").append("\n");
-                }
-                else if ("to".equalsIgnoreCase(isTo)){
+                } else if ("to".equalsIgnoreCase(isTo)) {
                     content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
                             .append("\t\t").append("AND tb." + splitValue[0] + " &lt;= DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
                             .append("\t").append("</if>").append("\n");
-                }else {
+                } else {
                     content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
                             .append("\t\t").append("AND tb." + splitValue[0] + " = DATE_FORMAT(#{dto." + key + "},'%Y-%m-%d %H:%i:%S')").append("\n")
                             .append("\t").append("</if>").append("\n");
                 }
 
+            } else {
+                content.append("\t").append("<if test=\"dto." + key + " != null\">").append("\n")
+                        .append("\t\t").append("AND tb." + splitValue[0] + " = #{dto." + key + "}").append("\n")
+                        .append("\t").append("</if>").append("\n");
             }
-
-
         }
         content.append("</selset>");
 
+        tableName = CommonUtil.parseTableName(tableName);
+        String className = CommonUtil.parseTableClassName(tableName);
+
         //写入文件
-        CommonUtil.writeFile(content.toString(), tableName);
+        CommonUtil.writeFile(content.toString(), className + "Mapper.xml");
     }
 
     @Override
-    public void createMapper(Map<String, Map<String, String>> mapperDto, String packageName) {
+    public void createMapper(String tableName, String methodName, String inputVOName, String outputVOName, String packageName) {
+        tableName = CommonUtil.parseTableName(tableName);
+        String className = CommonUtil.parseTableClassName(tableName);
+        //Repository
+        StringBuilder content = new StringBuilder();
+        content.append("package " + packageName + ".infra.mapper;").append("\n\n");
+        content.append("import org.springframework.data.repository.query.Param;").append("\n");
+        content.append("import java.util.List;").append("\n\n");
+        // 创建类
+        content.append("public class " + className + "Mapper {").append("\n\n");
 
+        content.append("\t").append("List<" + outputVOName + "> selectCondition(@Param(value = \"tenantId\") Long tenantId, @Param(value = \"dto\")")
+                .append(inputVOName + " dto);").append("\n");
+        content.append("}");
+        CommonUtil.writeFile(content.toString(), className + "Mapper.java");
     }
 
     @Override
     public void createInputVO(Map<String, String> inputVO, String inputVOName, String packageName) {
-
+        generateSetAndGet(inputVO, inputVOName, packageName);
     }
+
 
     @Override
     public void createOutputVO(Map<String, String> outputVO, String outputVOName, String packageName) {
+        generateSetAndGet(outputVO, outputVOName, packageName);
+    }
+
+    @Override
+    public void createRepository(String tableName, String methodName, String inputVOName, String outputVOName, String packageName) {
+        tableName = CommonUtil.parseTableName(tableName);
+        String className = CommonUtil.parseTableClassName(tableName);
+        //Repository
+        StringBuilder content = new StringBuilder();
+        content.append("package " + packageName + ".domain.repository;").append("\n\n");
+        content.append("import java.util.List;").append("\n\n");
+        // 创建类
+        content.append("public class " + className + "Repository {").append("\n\n");
+
+        content.append("\t").append("List<" + outputVOName + "> ")
+                .append(methodName).append(" (Long tenantId, ").append(inputVOName + " dto);").append("\n");
+        content.append("}");
+        CommonUtil.writeFile(content.toString(), className + "Repository.java");
+
+        StringBuilder contentImpl = new StringBuilder();
+        contentImpl.append("package " + packageName + ".infra.repository.impl;").append("\n\n");
+        contentImpl.append("import java.util.List;").append("\n\n");
+        // 创建类
+        contentImpl.append("public class " + className + "RepositoryImpl implements " + tableName + "Repository {").append("\n\n");
+
+        contentImpl.append("\t").append("@Override").append("\n");
+
+        contentImpl.append("\t").append("public List<" + outputVOName + "> ")
+                .append(methodName).append(" (Long tenantId, ").append(inputVOName + "dto){").append("\n");
+        contentImpl.append("\t\t").append("List<" + outputVOName + "> voList = " + tableName + "Mapper.selectCondition(tenantId, dto);").append("\n")
+                .append("\t\t").append("if (CollectionUtils.isEmpty(shiftVO9List)) {").append("\n")
+                .append("\t\t\t").append("return null;").append("\n")
+                .append("\t\t").append("}").append("\n")
+                .append("\t\t").append("// TODO others api query operation").append("\n")
+                .append("\t").append("}").append("\n")
+                .append("}");
+        CommonUtil.writeFile(contentImpl.toString(), className + "RepositoryImpl.java");
 
     }
 
     @Override
-    public void createRepository(String methodName, String inputVOName, String outputVOName, String packageName) {
+    public void createController(String tableName, String methodName, String inputVOName, String outputVOName, String packageName) {
+        tableName = CommonUtil.parseTableName(tableName);
+        String className = CommonUtil.parseTableClassName(tableName);
+
+        //Repository
+        StringBuilder content = new StringBuilder();
+        content.append("package " + packageName + ".api.controller.v1;").append("\n\n");
+        content.append("import io.choerodon.core.iam.ResourceLevel;").append("\n")
+                .append("import io.choerodon.swagger.annotation.Permission;").append("\n")
+                .append("import io.swagger.annotations.ApiOperation;").append("\n")
+                .append("import org.springframework.beans.factory.annotation.Autowired;").append("\n")
+                .append("import java.util.List;").append("\n\n");
+        // 创建类
+        content.append("public class " + className + "Controller {").append("\n\n");
+        content.append("\t").append("@Autowired").append("\n")
+                .append("\t").append("private "+tableName+"Repository"+" repository;").append("\n\n");
+
+        content.append("\t").append("@ApiOperation(value = \"" + methodName + "\")").append("\n")
+                .append("\t").append("@PostMapping(value = {\"/query\"}, produces = \"application/json;charset=UTF-8\")").append("\n")
+                .append("\t").append("@Permission(level = ResourceLevel.ORGANIZATION)").append("\n")
+                .append("\t").append("public ResponseData<List<" + outputVOName + ">> " + methodName + "(@PathVariable(\"organizationId\") Long tenantId, @RequestBody " + inputVOName + " dto) {").append("\n")
+                .append("\t\t").append("ResponseData<List<" + outputVOName + ">> result = new ResponseData<List<" + outputVOName + ">>();").append("\n")
+                .append("\t\t").append("try {").append("\n")
+                .append("\t\t\t").append("result.setRows(repository." + methodName + "(tenantId, dto));").append("\n")
+                .append("\t\t").append("} catch (Exception e) {").append("\n")
+                .append("\t\t\t").append("result.setSuccess(false);").append("\n")
+                .append("\t\t\t").append("result.setMessage(e.getMessage());").append("\n")
+                .append("\t\t").append("}").append("\n")
+                .append("\t\t").append("return result;").append("\n")
+                .append("\t").append("}").append("\n");
+
+        content.append("}");
+        CommonUtil.writeFile(content.toString(), className + "Controller.java");
 
     }
 
-    @Override
-    public void createController(String methodName, String inputVOName, String outputVOName, String packageName) {
+    /**
+     * 生成get set方法
+     *
+     * @param inputVO
+     * @param inputVOName
+     * @param packageName
+     */
+    private void generateSetAndGet(Map<String, String> inputVO, String inputVOName, String packageName) {
+        Set<Map.Entry<String, String>> entries = inputVO.entrySet();
+        StringBuilder content = new StringBuilder();
+        //导入包名
+        content.append("package " + packageName + ".domain.vo;").append("\n\n");
+        content.append("import java.io.Serializable;").append("\n\n");
+        for (Map.Entry<String, String> map : entries) {
+            //导入包
+            String importPackage = InitUtil.IMPORT_PACK_MAP.get(map.getValue());
+            if (null != importPackage) {
+                content.append(importPackage).append("\n");
+            }
+        }
+        // 创建类
+        content.append("public class " + inputVOName + " implements Serializable {").append("\n\n");
 
+        //创建属性
+        for (Map.Entry<String, String> map : entries) {
+            content.append("\t").append("private " + map.getValue() + " " + map.getKey() + ";").append("\n");
+        }
+        content.append("\n");
+        //创建set get方法
+        for (Map.Entry<String, String> map : entries) {
+            //如果是时间类型要注意set get方法有点特殊
+            //将属性名首字母转换成大写
+            String propertyName = InitUtil.generateFileName(map.getKey());
+            if ("Date".equalsIgnoreCase(map.getValue())) {
+
+            } else {
+                //get
+                content.append("\t").append("public " + map.getValue() + " get" + propertyName + "() {").append("\n")
+                        .append("\t\t").append("return " + map.getKey() + ";").append("\n")
+                        .append("\t").append("}").append("\n\n");
+
+                //set
+                content.append("\t").append("public void set" + propertyName + "(" + map.getValue() + " " + map.getKey() + ") {").append("\n")
+                        .append("\t\t").append("this." + map.getKey() + " =" + map.getKey() + ";").append("\n")
+                        .append("\t").append("}").append("\n\n");
+            }
+
+        }
+        content.append("}");
+
+        CommonUtil.writeVOFile(content.toString(), inputVOName + ".java");
     }
+
 }

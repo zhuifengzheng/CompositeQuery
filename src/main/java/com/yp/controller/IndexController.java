@@ -27,7 +27,6 @@ public class IndexController {
     @ResponseBody
     public String doCreateFile(IndexVO vo) {
         indexService.createEntrance(vo);
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxx");
         return "200";
     }
 

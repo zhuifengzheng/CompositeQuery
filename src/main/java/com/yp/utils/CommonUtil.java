@@ -14,6 +14,7 @@ import java.util.Map;
 public class CommonUtil {
     /**
      * 解析输入参数给mapper.xml
+     *
      * @param inputVO : PERSON_NAME:personName:String,PERSON_NAME:personName:String
      * @return java.util.Map<java.lang.String, java.util.Map < java.lang.String, java.lang.String>>
      */
@@ -32,22 +33,24 @@ public class CommonUtil {
 
     /**
      * 解析输入参数给mapper.xml
+     *
      * @param inputVO
      * @return
      */
-    public static Map<String,String> parseInputVOToXML(String inputVO) {
+    public static Map<String, String> parseInputVOToXML(String inputVO) {
         String[] split = inputVO.split(",");
         Map<String, String> outMap = new HashMap<>();
         for (String str : split) {
             String[] splitIn = str.split(":");
             //构造数据
-            outMap.put(splitIn[1], splitIn[0]+"."+splitIn[2]);
+            outMap.put(splitIn[1], splitIn[0] + "." + splitIn[2]);
         }
         return outMap;
     }
 
     /**
-     *  解析输出参数
+     * 解析输出参数
+     *
      * @param outputVO : personName:String,personAge:Integer
      * @return java.util.Map<java.lang.String, java.lang.String>
      */
@@ -62,11 +65,10 @@ public class CommonUtil {
     }
 
     /**
-     *
-     * @Author peng.yuan
-     * @Date 2019/10/12 18:10
      * @param inputVO : PERSON_NAME:personName:String,PERSON_NAME:personName:String
      * @return java.util.Map<java.lang.String,java.lang.String>
+     * @Author peng.yuan
+     * @Date 2019/10/12 18:10
      */
     public static Map<String, String> parseInputVO(String inputVO) {
         Map<String, String> map = new HashMap<>();
@@ -81,30 +83,46 @@ public class CommonUtil {
 
     /**
      * 写入文件到本地磁盘
+     *
      * @param content
      * @param tableName
      */
     public static void writeFile(String content, String tableName) {
-        FileOutputStream fileOutputStream = null;
         //这里tableName一般是这样的形式 MT_USER_TABLE => mtUserTable 转换成这样的名称
-        tableName = parseTableName(tableName);
+        //tableName = parseTableName(tableName);
+        generateFile(content, tableName);
+    }
+
+
+    /**
+     * 生成文件
+     *
+     * @param content
+     * @param tableName
+     */
+    public static void writeVOFile(String content, String tableName) {
+        generateFile(content, tableName);
+    }
+
+    private static void generateFile(String content, String tableName) {
+        FileOutputStream fileOutputStream = null;
         //获取当前文件路径
         try {
             String rootName = new File("").getCanonicalPath()
-                    + File.separator + "src" + File.separator +"common";
+                    + File.separator + "src" + File.separator + "common";
             //创建文件
             File file = new File(rootName);
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.mkdirs();
             }
 
-            File lastFile = new File(rootName+ File.separator +tableName+"Mapper.xml");
+            File lastFile = new File(rootName + File.separator + tableName);
             //写入文件
             fileOutputStream = new FileOutputStream(lastFile);
             fileOutputStream.write(content.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             if (fileOutputStream != null) {
                 try {
                     fileOutputStream.close();
@@ -115,36 +133,42 @@ public class CommonUtil {
                 }
             }
         }
-
-
-
     }
-
-
 
     /**
      * 解析tableName  MT_USER_TABLE => mtUserTable
+     *
      * @param tableName
      */
-    private static String parseTableName(String tableName) {
+    public static String parseTableName(String tableName) {
         String[] split = tableName.toLowerCase().split("_");
         StringBuilder finallyTableName = new StringBuilder();
-        for(int i=0; i<split.length; i++){
-            if(i == 0){
+        for (int i = 0; i < split.length; i++) {
+            if (i == 0) {
                 finallyTableName.append(split[0]);
-            }else {
-                finallyTableName.append(split[i].substring(0,1).toUpperCase()).append(split[i].substring(1,split[i].length()));
+            } else {
+                finallyTableName.append(split[i].substring(0, 1).toUpperCase()).append(split[i].substring(1, split[i].length()));
             }
         }
         return finallyTableName.toString();
     }
 
+    /**
+     * 将表名解析成类名
+     *
+     * @param tableName
+     * @return
+     */
+    public static String parseTableClassName(String tableName) {
+        return tableName.substring(0, 1).toUpperCase() + tableName.substring(1, tableName.length());
+    }
+
     public static void main(String[] args) throws IOException {
         String rootName = new File("").getCanonicalPath()
-                + File.separator + "src" + File.separator +"common"+ File.separator;
+                + File.separator + "src" + File.separator + "common" + File.separator;
         System.out.println(rootName);
         String str = "123456789";
-        String isForm = str.substring(str.length()-4,str.length());
+        String isForm = str.substring(str.length() - 4, str.length());
 
         System.out.println(isForm);
     }

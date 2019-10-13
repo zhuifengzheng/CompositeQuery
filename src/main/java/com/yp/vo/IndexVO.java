@@ -2,13 +2,14 @@ package com.yp.vo;
 
 import lombok.Data;
 
+
 /**
  * @author fengzheng
  * @create 2019-10-11 22:39
  * @desc
  **/
 @Data
-public class IndexVO {
+public class IndexVO{
     /**
      *  inputVO 输入参数
      *  outputVO 返回参数
@@ -25,4 +26,5 @@ public class IndexVO {
     private String  inputVOName;
     private String  outputVOName;
     private String packageName;
+
 }
