@@ -18,22 +18,24 @@
         margin-top: -250px;
         margin-left: -150px;
     }
-    input{display: block; width: 335.6px}
-
+    input{display: block; width: 353.6px}
+    .but{
+        width: 357.6px
+    }
     textarea{display: block;}
 </style>
 <body>
 <div class="fa">
     <form class="ff" action="##" method="post">
 
-            <input type="text"  name="methodName"  placeholder="请输入方法名称">
-            <input type="text"  name="tableName"  placeholder="请输入表名">
-            <input type="text"  name="inputVOName"  placeholder="请输入输入参数包装实体名称">
-            <input  type="text"  name="outputVOName"  placeholder="请输入输出参数包装实体名称">
-            <input type="text"  name="packageName"  placeholder="请输入包根路径，例如：com.cn">
-            <textarea rows="10" cols="50" name="inputVO" placeholder="请输入输入参数,格式为:PERSON_NAME:personName:String,PERSON_AGE:personAge:Integer"></textarea>
-            <textarea rows="10" cols="50" name="outputVO" placeholder="请输入返回参数,格式为:personName:String,personAge:Integer"></textarea>
-            <input type="button" value="登录" onclick="login()">
+        <input type="text"  name="methodName"  placeholder="请输入方法名称">
+        <input type="text"  name="tableName"  placeholder="请输入表名">
+        <input type="text"  name="inputVOName"  placeholder="请输入输入参数包装实体名称">
+        <input  type="text"  name="outputVOName"  placeholder="请输入输出参数包装实体名称">
+        <input type="text"  name="packageName"  placeholder="请输入包根路径，例如：com.cn">
+        <textarea rows="10" cols="50" name="inputVO" placeholder="请输入输入参数,格式为:PERSON_NAME:personName:String,PERSON_AGE:personAge:Integer"></textarea>
+        <textarea rows="10" cols="50" name="outputVO" placeholder="请输入返回参数,格式为:personName:String,personAge:Integer"></textarea>
+        <input class="but" type="button" value="登录" onclick="login()" width="357.6px">
 
     </form>
 </div>
