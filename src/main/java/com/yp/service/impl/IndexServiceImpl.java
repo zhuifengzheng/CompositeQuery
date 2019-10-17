@@ -120,7 +120,7 @@ public class IndexServiceImpl implements IndexService {
                         .append("\t").append("</if>").append("\n");
             }
         }
-        content.append("</selset>");
+        content.append("</select>");
 
         tableName = CommonUtil.parseTableName(tableName);
         String className = CommonUtil.parseTableClassName(tableName);
@@ -211,7 +211,7 @@ public class IndexServiceImpl implements IndexService {
         // 创建类
         content.append("public class " + className + "Controller {").append("\n\n");
         content.append("\t").append("@Autowired").append("\n")
-                .append("\t").append("private "+tableName+"Repository"+" repository;").append("\n\n");
+                .append("\t").append("private " + tableName + "Repository" + " repository;").append("\n\n");
 
         content.append("\t").append("@ApiOperation(value = \"" + methodName + "\")").append("\n")
                 .append("\t").append("@PostMapping(value = {\"/query\"}, produces = \"application/json;charset=UTF-8\")").append("\n")
@@ -244,7 +244,8 @@ public class IndexServiceImpl implements IndexService {
         StringBuilder content = new StringBuilder();
         //导入包名
         content.append("package " + packageName + ".domain.vo;").append("\n\n");
-        content.append("import java.io.Serializable;").append("\n\n");
+        content.append("import java.io.Serializable;").append("\n");
+        content.append("import io.swagger.annotations.ApiModelProperty;").append("\n");
         for (Map.Entry<String, String> map : entries) {
             //导入包
             String importPackage = InitUtil.IMPORT_PACK_MAP.get(map.getValue());
@@ -257,6 +258,7 @@ public class IndexServiceImpl implements IndexService {
 
         //创建属性
         for (Map.Entry<String, String> map : entries) {
+            content.append("\t").append("@ApiModelProperty(\"\")").append("\n");
             content.append("\t").append("private " + map.getValue() + " " + map.getKey() + ";").append("\n");
         }
         content.append("\n");
@@ -266,7 +268,23 @@ public class IndexServiceImpl implements IndexService {
             //将属性名首字母转换成大写
             String propertyName = InitUtil.generateFileName(map.getKey());
             if ("Date".equalsIgnoreCase(map.getValue())) {
+                //get
+                content.append("\t").append("public Date get" + propertyName + "() {").append("\n")
+                        .append("\t\t").append("if (" + map.getKey() + " != null) {").append("\n")
+                        .append("\t\t\t").append("return (Date) " + map.getKey() + ".clone();").append("\n")
+                        .append("\t\t").append("} else  {").append("\n")
+                        .append("\t\t\t").append("return null;").append("\n")
+                        .append("\t\t")
+                        .append("\t").append("}").append("\n\n");
 
+                //set
+                content.append("\t").append("public void set" + propertyName + "(Date " + map.getKey() + ") {").append("\n")
+                        .append("\t\t").append("if (" + map.getKey() + " == null) {").append("\n")
+                        .append("\t\t\t").append("this." + map.getKey() + " = null;").append("\n")
+                        .append("\t\t").append("} else {").append("\n")
+                        .append("\t\t\t").append("this." + map.getKey() + " = (Date) " + map.getKey() + ".clone();").append("\n")
+                        .append("\t\t").append("}").append("\n")
+                        .append("\t").append("}").append("\n\n");
             } else {
                 //get
                 content.append("\t").append("public " + map.getValue() + " get" + propertyName + "() {").append("\n")

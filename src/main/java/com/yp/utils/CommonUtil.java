@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -20,8 +21,8 @@ public class CommonUtil {
      */
     public static Map<String, Map<String, String>> parseInputVOXML(String inputVO) {
         String[] split = inputVO.split(",");
-        Map<String, String> innerMap = new HashMap<>();
-        Map<String, Map<String, String>> outMap = new HashMap<>();
+        Map<String, String> innerMap = new LinkedHashMap<>();
+        Map<String, Map<String, String>> outMap = new LinkedHashMap<>();
         for (String str : split) {
             String[] splitIn = str.split(":");
             //构造数据
@@ -39,7 +40,7 @@ public class CommonUtil {
      */
     public static Map<String, String> parseInputVOToXML(String inputVO) {
         String[] split = inputVO.split(",");
-        Map<String, String> outMap = new HashMap<>();
+        Map<String, String> outMap = new LinkedHashMap<>();
         for (String str : split) {
             String[] splitIn = str.split(":");
             //构造数据
@@ -55,7 +56,7 @@ public class CommonUtil {
      * @return java.util.Map<java.lang.String, java.lang.String>
      */
     public static Map<String, String> parseOutInputVO(String outputVO) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
         String[] split = outputVO.split(",");
         for (String str : split) {
             String[] splitIn = str.split(":");
@@ -71,7 +72,7 @@ public class CommonUtil {
      * @Date 2019/10/12 18:10
      */
     public static Map<String, String> parseInputVO(String inputVO) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
         String[] split = inputVO.split(",");
         for (String str : split) {
             String[] splitIn = str.split(":");

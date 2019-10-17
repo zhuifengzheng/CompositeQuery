@@ -14,6 +14,8 @@ public class InitUtil {
     static {
 
         IMPORT_PACK_MAP.put("DATE", "import java.util.Date;");
+        IMPORT_PACK_MAP.put("Date", "import java.util.Date;");
+        IMPORT_PACK_MAP.put("date", "import java.util.Date;");
         IMPORT_PACK_MAP.put("List<String>", "import java.util.List;");
 
     }
