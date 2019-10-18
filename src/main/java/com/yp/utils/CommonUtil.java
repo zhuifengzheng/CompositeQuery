@@ -3,9 +3,7 @@ package com.yp.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author peng.yuan
@@ -13,6 +11,10 @@ import java.util.Map;
  * @description 公共工具类
  */
 public class CommonUtil {
+
+    //定义全局接收参数的集合
+    public static List<String> inputNotes = new ArrayList();
+    public static List<String> outputNotes = new ArrayList();
     /**
      * 解析输入参数给mapper.xml
      *
@@ -45,6 +47,8 @@ public class CommonUtil {
             String[] splitIn = str.split(":");
             //构造数据
             outMap.put(splitIn[1], splitIn[0] + "." + splitIn[2]);
+            //把注释添加到集合中
+            inputNotes.add(splitIn[3]);
         }
         return outMap;
     }
@@ -61,6 +65,8 @@ public class CommonUtil {
         for (String str : split) {
             String[] splitIn = str.split(":");
             map.put(splitIn[0], splitIn[1]);
+            //把注释添加到集合中
+            outputNotes.add(splitIn[2]);
         }
         return map;
     }

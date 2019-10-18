@@ -6,6 +6,7 @@ import com.yp.utils.InitUtil;
 import com.yp.vo.IndexVO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -149,13 +150,14 @@ public class IndexServiceImpl implements IndexService {
 
     @Override
     public void createInputVO(Map<String, String> inputVO, String inputVOName, String packageName) {
-        generateSetAndGet(inputVO, inputVOName, packageName);
+
+        generateSetAndGet(inputVO, inputVOName, packageName, CommonUtil.inputNotes);
     }
 
 
     @Override
     public void createOutputVO(Map<String, String> outputVO, String outputVOName, String packageName) {
-        generateSetAndGet(outputVO, outputVOName, packageName);
+        generateSetAndGet(outputVO, outputVOName, packageName, CommonUtil.outputNotes);
     }
 
     @Override
@@ -239,7 +241,7 @@ public class IndexServiceImpl implements IndexService {
      * @param inputVOName
      * @param packageName
      */
-    private void generateSetAndGet(Map<String, String> inputVO, String inputVOName, String packageName) {
+    private void generateSetAndGet(Map<String, String> inputVO, String inputVOName, String packageName, List dataList) {
         Set<Map.Entry<String, String>> entries = inputVO.entrySet();
         StringBuilder content = new StringBuilder();
         //导入包名
@@ -257,9 +259,11 @@ public class IndexServiceImpl implements IndexService {
         content.append("public class " + inputVOName + " implements Serializable {").append("\n\n");
 
         //创建属性
+        int i = 0;
         for (Map.Entry<String, String> map : entries) {
-            content.append("\t").append("@ApiModelProperty(\"\")").append("\n");
+            content.append("\t").append("@ApiModelProperty(\""+dataList.get(i)+"\")").append("\n");
             content.append("\t").append("private " + map.getValue() + " " + map.getKey() + ";").append("\n");
+            i++;
         }
         content.append("\n");
         //创建set get方法
@@ -275,6 +279,7 @@ public class IndexServiceImpl implements IndexService {
                         .append("\t\t").append("} else  {").append("\n")
                         .append("\t\t\t").append("return null;").append("\n")
                         .append("\t\t")
+                        .append("\t\t").append("}").append("\n")
                         .append("\t").append("}").append("\n\n");
 
                 //set
