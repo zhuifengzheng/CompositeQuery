@@ -1,8 +1,8 @@
 # 组合查询API生成模板工具
 
 ## 导入分析
-> + 需要传入类型为查询参数的数据格式： PERSON_NAME:personName:String,PERSON_AGE:personAge:Integer  这样的格式主要是为了和文档保持一致便于复制，但是这样的问题是会导致解析这样的格式时候比较慢，但考虑到项目自己使用，就不再去改输入格式了，输入格式对代码结构也有影响，好的输入格式可以使用更好的数据格式去存储。
-> + 需要返回参数数据格式：personName:String,personAge:Integer
+> + 需要传入类型为查询参数的数据格式： PERSON_NAME:personName:String:名字,PERSON_AGE:personAge:Integer:年龄  这样的格式主要是为了和文档保持一致便于复制，但是这样的问题是会导致解析这样的格式时候比较慢，但考虑到项目自己使用，就不再去改输入格式了，输入格式对代码结构也有影响，好的输入格式可以使用更好的数据格式去存储。
+> + 需要返回参数数据格式：personName:String:名字,personAge:Integer:年龄
 > + 入参的实体名称：xxxVO  返回参数的实体名称： xxxVO2
 > + 传入的方法名称：xxx
 > + 传入表名：xxxtable
